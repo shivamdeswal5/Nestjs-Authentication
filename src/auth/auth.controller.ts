@@ -12,4 +12,9 @@ export class AuthController {
     login(@Body() dto:loginDto) {
         return this.authService.login(dto);
     }
+
+    @Post('reset-password')
+    async resetPassword(@Body() {token,password}:{token:string;password:string}){
+        return this.authService.resetPassword(token,password);
+    }
 }
