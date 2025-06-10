@@ -8,7 +8,9 @@ import { UserModule } from './user/user.module';
 import { OtpModule } from './otp/otp.module';
 import { AuthModule } from './auth/auth.module';
 import * as path from 'path';
-
+import * as dotenv from 'dotenv';
+dotenv.config();
+ 
 @Module({
   imports: [
     ConfigModule.forRoot({

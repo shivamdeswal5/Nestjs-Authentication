@@ -88,8 +88,10 @@ export class OTPService {
 
     async validateResetPassword(token: string) {
         try {
+            console.log(this.configService.get<string>('JWT_RESET_SECRET'))
             const decoded = this.jwtService.verify(token, {
                 secret: this.configService.get<string>('JWT_RESET_SECRET'),
+                
             });
 
             return decoded.id;

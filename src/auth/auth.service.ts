@@ -89,7 +89,7 @@ export class AuthService {
     user.password = await bcrypt.hash(newPassword, 10);
     await this.userRepository.save(user);
 
-    return 'Password reset successfully';
+    return 'Password reset successfully'; 
     }
 
 

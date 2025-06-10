@@ -51,6 +51,8 @@ export class UserService {
     else if (otpType === OTPType.RESET_LINK) {
 
       const resetLink = `${this.configService.get<string>('RESET_PASSWORD_URL')}?token=${token}`;
+      console.log(this.configService.get<string>('RESET_PASSWORD_URL'))
+      console.log(resetLink);
 
       const emailDto = {
         recipient: [user.email],
