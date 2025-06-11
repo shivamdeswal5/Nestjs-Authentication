@@ -20,6 +20,9 @@ export class User {
   @Column({default:'unverified'})
   accountStatus: 'verified' | 'unverified';
 
+  @Column({ type: 'varchar',  nullable: true })
+  profileImg: string
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -7,9 +7,10 @@ import { UserRepository } from './user.repository';
 import { DataSource } from 'typeorm';
 import { OtpModule } from '../otp/otp.module';
 import { EmailModule } from 'src/email/email.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]),OtpModule,EmailModule],
+  imports: [TypeOrmModule.forFeature([User]),OtpModule,EmailModule,CloudinaryModule],
   controllers: [UserController],
   providers: [
     UserService,

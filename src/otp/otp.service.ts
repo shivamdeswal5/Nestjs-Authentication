@@ -33,7 +33,8 @@ export class OTPService {
             if (existingOTP) {
                 existingOTP.token = hashedOtp;
                 existingOTP.expiresAt = expiresAt;
-                await this.otpRepository.save(existingOTP)
+                await this.otpRepository.save(existingOTP);
+                return otp;
             } else {
                 const otpEntity = this.otpRepository.create({
                     user,
@@ -43,16 +44,17 @@ export class OTPService {
                 })
 
                 await this.otpRepository.save(otpEntity);
+                return otp;
             }
 
-            const otpEntity = this.otpRepository.create({
-                user,
-                token: hashedOtp,
-                type,
-                expiresAt
-            });
-            await this.otpRepository.save(otpEntity);
-            return otp;
+            // const otpEntity = this.otpRepository.create({
+            //     user,
+            //     token: hashedOtp,
+            //     type,
+            //     expiresAt
+            // });
+            // await this.otpRepository.save(otpEntity);
+           
         } else if (type === OTPType.RESET_LINK) {
             const resetToken = this.jwtService.sign(
                 { id: user.id, email: user.email },
