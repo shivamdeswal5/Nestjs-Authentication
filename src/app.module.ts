@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { AuthMiddleware } from './middleware/auth.middleware';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -60,4 +62,13 @@ dotenv.config();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(
+        // { path: 'user/*', method: RequestMethod.ALL },
+        { path: 'auth/profile', method: RequestMethod.GET }
+      );
+  }
+}

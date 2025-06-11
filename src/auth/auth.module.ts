@@ -19,6 +19,7 @@ import { OtpModule } from 'src/otp/otp.module';
     })
   ],
   providers: [AuthService],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [JwtModule],
 })
 export class AuthModule {}

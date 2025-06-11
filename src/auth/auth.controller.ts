@@ -1,11 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { loginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
-<<<<<<< HEAD
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-=======
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
->>>>>>> e1773fb8a27198e9440686a2f81e0d358e109d47
 
 @Controller('auth')
 export class AuthController {
@@ -23,21 +19,13 @@ export class AuthController {
         return this.authService.resetPassword(token, password);
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('profile')
     getProfile(@Req() request) {
         return {
             message: 'Welcome to profile',
-            user: request.user, //fetch user from request
+            // user: request.user, 
+            user:request['user']
         };
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    getProfile(@Req() request){
-        return{
-            message:'welcome to profile',
-            user: request.user, // fetch user from request
-        }
     }
 }
