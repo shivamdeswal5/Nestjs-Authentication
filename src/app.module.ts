@@ -46,7 +46,7 @@ dotenv.config();
             pass:process.env.MAIL_PASSWORD,
           },
         },
-        default: '"No Reply" <no-reply@localhost>',
+        default: '"No Reply" <deswalworks@gmail.com>',
       })
       
     }),

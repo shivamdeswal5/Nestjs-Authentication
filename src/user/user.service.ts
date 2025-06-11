@@ -53,7 +53,6 @@ export class UserService {
   }
 
   async emailVerification(user: User, otpType: OTPType) {
-
     const token = await this.otpService.generateToken(user, otpType);
     if (otpType === OTPType.OTP) {
       const emailDto = {
@@ -61,7 +60,13 @@ export class UserService {
         subject: 'OTP for verification',
         html: `Your OTP is ${token}. It is valid for 5 minutes.`,
       }
-      return await this.emailService.sendMail(emailDto);
+        const emailData = {
+        to: user.email,
+        from: 'deswalworks@gmail.com',
+        subject: 'OTP for verification',
+        html: `Your OTP is ${token}. It is valid for 5 minutes.`,
+      }
+      return await this.mailerService.sendMail(emailData);
     }
     else if (otpType === OTPType.RESET_LINK) {
       const resetLink = `${this.configService.get<string>('RESET_PASSWORD_URL')}?token=${token}`;
@@ -74,7 +79,15 @@ export class UserService {
         html: `Click Given Link To Change Password:
         <p><a href = "${resetLink}">Reset Password</a></P>`,
       }
-      return await this.emailService.sendMail(emailDto);
+      const emailData = {
+        to: user.email,
+        from: 'deswalworks@gmail.com',
+        subject: 'Password Reset Link',
+        html: `Click Given Link To Change Password:
+        <p><a href = "${resetLink}">Reset Password</a></P>`,
+      }
+      // return await this.emailService.sendMail(emailDto);
+      return this.mailerService.sendMail(emailData);
 
     }
 
@@ -93,8 +106,6 @@ export class UserService {
       throw new BadRequestException('no file uploaded');
     }
     const allowedImageMimeTypes = ['image/jpeg', 'image/png', 'image/avif'];
-    const allowedVideoMimeTypes = ['video/mp4','video/avi','video/webm']
-
     if (!allowedImageMimeTypes.includes(file.mimetype)) {
       throw new BadRequestException('Invalid file type');
     }
@@ -106,14 +117,23 @@ export class UserService {
     const result =  this.cloudinaryService.uploadImage(file);
     const imageUrl = (await result).url
 
-    const emailDto = {
-        recipient: ['shivam.1171@zenmonk.tech'],
+    // const emailDto = {
+    //     recipient: ['shivam.1171@zenmonk.tech'],
+    //     subject: 'Image Uploaded To Cloudinary',
+    //     html: `File Has Been Uploaded to Cloudinary. Link Of Uploaded File:
+    //     <p><a href = "${imageUrl}">File Url</a></P>`,
+    //   }
+    //   this.emailService.sendMail(emailDto);
+
+      const emailData = {
+        to:'deswalworks@gmail.com',
+        from: 'deswalworks@gmail.com',
         subject: 'Image Uploaded To Cloudinary',
         html: `File Has Been Uploaded to Cloudinary. Link Of Uploaded File:
-        <p><a href = "${imageUrl}">File Url</a></P>`,
+        <p><a href = "${imageUrl}">File Url</a></P>`
       }
 
-      this.emailService.sendMail(emailDto);
+      this.mailerService.sendMail(emailData);
 
       return {
         message: 'Image Uploaded Successfully, Please Check your mail',
