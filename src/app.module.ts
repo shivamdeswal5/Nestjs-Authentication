@@ -7,6 +7,9 @@ import { EmailModule } from './email/email.module';
 import { UserModule } from './user/user.module';
 import { OtpModule } from './otp/otp.module';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -24,7 +27,7 @@ dotenv.config();
           port: Number(process.env.DB_PORT),
           username: process.env.DB_USERNAME,
           password: process.env.DB_PASSWORD,
-          database: process.env.DB_NAME,
+          database: process.env.DB_DATABASE,
           synchronize: false,
           entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
           migrations: [path.resolve(__dirname, '../database/migrations/*-migration.ts')],
@@ -32,10 +35,27 @@ dotenv.config();
       }
     ),
     }),
+
+    MailerModule.forRootAsync({
+      useFactory: ()=>({
+        transport: {
+          host: process.env.MAIL_HOST,
+          port: process.env.MAIAL_PORT,
+          auth:{
+            user: process.env.MAIL_USERNAME,
+            pass:process.env.MAIL_PASSWORD,
+          },
+        },
+        default: '"No Reply" <deswalworks@gmail.com>',
+      })
+      
+    }),
+    
     EmailModule,
     UserModule,
     OtpModule,
     AuthModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
