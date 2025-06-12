@@ -17,7 +17,7 @@ export class AuthService {
         private readonly configService: ConfigService
     ) { }
 
-    async login(dto: loginDto, res) {
+    async login(dto: loginDto) {
         const { email, password, otp } = dto;
         try {
             const user = await this.userRepository.findOne({ where: { email } });
@@ -47,12 +47,11 @@ export class AuthService {
             //generate JWT token
             const payload = { id: user.id, email: user.email };
             const accessToken = this.jwtService.sign(payload);
-            console.log("ACCESS TOKEN", accessToken)
+            console.log("ACCESS TOKEN", accessToken);
 
             return {
                 accessToken,
-                userId: user.id,
-                email: user.email
+                user
             };
 
         } catch (error) {
@@ -96,10 +95,10 @@ export class AuthService {
     }
 
 
-    async getMovies(req:Request) {
+    async getMovies(req: Request) {
         const token = req.cookies['accessToken']
         try {
-            
+
             const decoded = this.jwtService.verify(token, {
                 secret: this.configService.get<string>('JWT_SECRET'),
             });
@@ -111,11 +110,36 @@ export class AuthService {
 
             return {
                 user: userDetails,
-                movies: ['Avengers','Squid Game']
+                movies: ['Avengers', 'Squid Game']
 
             };
         } catch (error) {
             throw new UnauthorizedException('Invalid or expired token');
+        }
+    }
+
+    async getSongs(session: Record<string, any>) {
+        console.log("Session: ", session)
+        console.log("Session User: ", session.user)
+        try {
+
+            if (session.user === undefined) {
+                throw new UnauthorizedException('Session Expired or Not Found Please Login')
+            }
+
+            const userDetails = {
+                userId: session.user.id,
+                email : session.user.email
+            }
+
+            return {
+                user: userDetails,
+                movies: ['Avengers', 'Squid Game']
+
+            };
+        } catch (error ) {
+            throw new UnauthorizedException('Session Expired')
+            
         }
     }
 

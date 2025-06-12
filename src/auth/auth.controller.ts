@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, Session, UseGuards } from '@nestjs/common';
 import { loginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
@@ -11,12 +11,14 @@ export class AuthController {
     ) { }
 
     @Post('login')
-    async login(@Body() dto: loginDto, @Res({ passthrough: true }) res) {
-        const result = await this.authService.login(dto, res);
+    async login(@Body() dto: loginDto, @Res({ passthrough: true }) res,@Req() req) {
+        const result = await this.authService.login(dto);
         res.cookie('accessToken', result?.accessToken, {
             httpOnly: true,
             expires: new Date(new Date().getTime() + 15 * 60 * 1000)
         });
+
+        req.session.user = (result?.user) 
 
         res.send({
             ...result
@@ -42,11 +44,28 @@ export class AuthController {
     getGetCookies(@Req() req): string {
         return req.cookies
     }
+
     @Get('movies')
     getMovies(@Req() req: Request) {
-        // const token = req.cookies['accessToken'];
-        // console.log('Token',token)
         return this.authService.getMovies(req);
+    }
+
+    @Get('songs')
+    async getSongs(
+        @Session() session : Record<string,any>
+    ){
+       return this.authService.getSongs(session);
+    }
+
+    @Get('session')
+    async getAuthSession(
+        @Session() session : Record<string,any>
+    ){
+        return {
+            session : session,
+            sessionId: session.id
+        };
+
     }
 }
 
