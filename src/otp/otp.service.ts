@@ -47,14 +47,14 @@ export class OTPService {
                 return otp;
             }
 
-            const otpEntity = this.otpRepository.create({
-                user,
-                token: hashedOtp,
-                type,
-                expiresAt
-            });
-            await this.otpRepository.save(otpEntity);
-            return otp;
+            // const otpEntity = this.otpRepository.create({
+            //     user,
+            //     token: hashedOtp,
+            //     type,
+            //     expiresAt
+            // });
+            // await this.otpRepository.save(otpEntity);
+            // return otp;
         } else if (type === OTPType.RESET_LINK) {
             const resetToken = this.jwtService.sign(
                 { id: user.id, email: user.email },

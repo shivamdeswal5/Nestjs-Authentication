@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module,NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -14,6 +14,7 @@ import { MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 dotenv.config();
  
 @Module({
@@ -62,7 +63,8 @@ dotenv.config();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
+export class AppModule implements NestModule{
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
