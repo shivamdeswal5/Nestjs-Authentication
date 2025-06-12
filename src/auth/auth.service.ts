@@ -49,14 +49,6 @@ export class AuthService {
             const accessToken = this.jwtService.sign(payload);
             console.log("ACCESS TOKEN", accessToken)
 
-            // res.cookie('accessToken',accessToken,{
-            //     httpOnly:true,
-            //     expires: new Date().getTime() + 15*60*1000
-            // });
-
-            // res.send({
-            //     accessToken
-            // })
             return {
                 accessToken,
                 userId: user.id,
