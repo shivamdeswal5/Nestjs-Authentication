@@ -3,6 +3,7 @@ import { loginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
 import { Request } from 'express';
+import { access } from 'fs';
 
 @Controller('auth')
 export class AuthController {
@@ -16,13 +17,24 @@ export class AuthController {
         res.cookie('accessToken', result?.accessToken, {
             httpOnly: true,
             expires: new Date(new Date().getTime() + 15 * 60 * 1000)
-        });
+        })
+        .cookie("refreshToken",result?.refreshToken);
 
         req.session.user = (result?.user) 
 
         res.send({
-            ...result
+            accessToken: result?.accessToken,
+            refreshToken: result?.refreshToken,
+            userId: result?.user?.id,
+            email:result?.user?.email,
+            message: "User Logged In Successfully"
         })
+    }
+
+    @Post('refresh-token')
+    refreshToken(@Req() request:Request){
+        return this.authService.refreshAccessToken(request)
+
     }
 
     @Post('reset-password')
@@ -67,5 +79,11 @@ export class AuthController {
         };
 
     }
+
+    // @Get('jwt')
+    // getTokens(){
+    //     const userId = 'c4358ae3-c7e3-453a-8f0b-09ad3e7416f0'
+    //     return this.authService.generateAccessAndRefershToken(userId);
+    // }
 }
 

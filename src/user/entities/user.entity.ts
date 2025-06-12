@@ -23,6 +23,9 @@ export class User {
   @Column({ type: 'varchar',  nullable: true })
   profileImg: string
 
+  @Column({type: 'varchar',nullable:true})
+  refreshToken: string
+
   @CreateDateColumn()
   createdAt: Date;
 

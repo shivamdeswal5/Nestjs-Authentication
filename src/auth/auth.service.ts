@@ -43,14 +43,12 @@ export class AuthService {
                     await this.verifyToken(user.id, otp);
                 }
             }
-
             //generate JWT token
-            const payload = { id: user.id, email: user.email };
-            const accessToken = this.jwtService.sign(payload);
-            console.log("ACCESS TOKEN", accessToken);
+            const { accessToken, refreshToken } = await this.generateAccessAndRefershToken(user.id);
 
             return {
                 accessToken,
+                refreshToken,
                 user
             };
 
@@ -58,6 +56,75 @@ export class AuthService {
             if (error instanceof HttpException || error instanceof UnauthorizedException) {
                 throw error
             }
+        }
+
+    }
+
+    async refreshAccessToken(req: Request) {
+        const incomingRefreshToken = req.cookies.refreshToken;
+        console.log("Incoming Refresh Token: ",incomingRefreshToken);
+        if (!incomingRefreshToken) {
+            throw new UnauthorizedException('Unauthorized Request')
+        }
+
+        try {
+            const decodedToken = this.jwtService.verify(incomingRefreshToken,
+                {
+                    secret: process.env.REFRESH_TOKEN_SECRET
+                }
+            )
+
+            console.log("decoded token: ",decodedToken);
+
+            const user = await this.userRepository.findOne({
+                where: {
+                    id: decodedToken?.id
+                }
+            })
+
+            console.log("User: ",user);
+
+            if (!user) {
+                throw new HttpException('Invalid Refresh Token', 401);
+            }
+
+            if (incomingRefreshToken !== user?.refreshToken) {
+                throw new HttpException('Refresh Token Expired', 401)
+            }
+
+            const { accessToken, refreshToken } = await this.generateAccessAndRefershToken(user?.id);
+            return {
+                message: "Access Token Refreshed",
+                accessToken,
+                refreshToken
+            }
+        } catch (error) {
+            throw error
+
+        }
+
+
+    }
+
+    async generateAccessAndRefershToken(userId: string) {
+        try {
+            const user = await this.userRepository.findOneBy({ id: userId });
+            if (!user) {
+                throw new HttpException('User not found', 404);
+            }
+            const payload = { id: user.id, email: user.email };
+            const accessToken = this.jwtService.sign(payload);
+
+            const refreshToken = this.jwtService.sign({ payload }, { secret: process.env.REFRESH_TOKEN_SECRET, expiresIn: '1hr' })
+            user.refreshToken = refreshToken;
+            this.userRepository.save(user);
+            return {
+                accessToken,
+                refreshToken,
+            }
+
+        } catch (error) {
+            throw new HttpException("Something Went Wrong While Generating Tokens", 500);
         }
 
     }
@@ -129,7 +196,7 @@ export class AuthService {
 
             const userDetails = {
                 userId: session.user.id,
-                email : session.user.email
+                email: session.user.email
             }
 
             return {
@@ -137,11 +204,13 @@ export class AuthService {
                 movies: ['Avengers', 'Squid Game']
 
             };
-        } catch (error ) {
+        } catch (error) {
             throw new UnauthorizedException('Session Expired')
-            
+
         }
     }
+
+
 
 }
 
